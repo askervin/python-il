@@ -1,7 +1,9 @@
 # il - inline assembly in Python 3
 
-Example on `il` decorator API
------------------------------
+Examples
+--------
+
+1. Decorator API - simple
 
 ```python
 import il
@@ -24,25 +26,45 @@ def add_ints(rdi=ctypes.c_int32, rsi=ctypes.c_int32):
 print(add_ints(43, -1))
 ```
 
+2. Function API - powerful
+
+```python
+add_ints = il.def_asm(
+     name="add_ints",
+     prototype=ctypes.CFUNCTYPE(ctypes.c_int32,  # return value (eax)
+                                ctypes.c_int32,  # 1st param (edi)
+                                ctypes.c_int32), # 2nd param (esi)
+     code="""
+     .intel_syntax noprefix
+     mov rax, 0
+     mov eax, edi
+     add eax, esi
+     ret
+     """)
+
+print(add_ints(43, -1))
+```
+
 Dependencies
 ------------
 
-- No dependencies outside Python standard library if object code ships
-  with Python file that includes inlined assembly (FILE.py.il).
-  `ctypes` from the standard library is needed for loading and running
-  object code.
+- If object code is available: no dependencies outside Python standard
+  library. `ctypes` from the standard library is needed for loading
+  and running object code.
 
-- `as` and `objcopy` (from `binutils`) are required for compiling
-  assembly if object code is not already available.
+- If object code is not available: `as` and `objcopy` (from
+  `binutils`) are required for compiling assembly.
 
 Install
 -------
+
 ```sh
 $ sudo python3 setup.py install
 ```
 
 Library API documentation and call conventions
 ----------------------------------------------
+
 ```sh
 $ python3 -c 'import il; help(il)'
 ```
@@ -73,7 +95,6 @@ Debugging inlined assembly
 1. Import the library, print the pid of the Python process and the
    address of the function that you want to debug:
    ```python
-   $ python3
    >>> import mylib
    >>> import os
    >>> os.getpid()
