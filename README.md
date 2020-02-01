@@ -58,6 +58,14 @@ Dependencies
 Install
 -------
 
+From PyPI:
+
+```sh
+$ pip3 install il
+```
+
+From source tree:
+
 ```sh
 $ sudo python3 setup.py install
 ```
